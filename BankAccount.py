@@ -84,7 +84,7 @@ class bankAccount_Class(object):
         self._printTransactions = printTransactions
 
     def printToGuiComponents(self):
-        returnString = self._name + " med kontobeløb " + str("%.2f" % self._balance) + " er kunde i " + self._bankName
+        returnString = self._name + " med kontobeløb " + str("%.2f" % self._balance) + " er kunde i " + self.__class__.__name__
         return (returnString)
 
 class arbejdernesLandsbank_Class(bankAccount_Class):

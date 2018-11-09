@@ -2,27 +2,55 @@ from tkinter import *
 from tkinter import ttk
 import tkinter as tk
 
+from enum import Enum
+
 from BankAccount import bankAccount_Class
 from BankAccount import arbejdernesLandsbank_Class
 from BankAccount import sparNordBank_Class
 from BankAccount import sparNordBankFordelKunde_Class
 
+class BankClass_ENUM(Enum):
+    ALLE_BANKER = 0
+    ARBEJDERNES_LANDSBANK = 1
+    SPARNORD_BANK = 2
+    SPARNORD_BANK_FORDELSKUNDE = 3
+
 
 def updateBankCustomersList(listBankCustomers, bankCustomerList, global_Bank_Choosen):
     listBankCustomers.delete(0, END)
     listCounter = 1
-    if (0 == global_Bank_Choosen):
+    if (BankClass_ENUM.ALLE_BANKER.value == global_Bank_Choosen.get()):
         for bankCustomer in bankCustomerList:
-            bankAccountInfo = (str)(print(bankCustomer))
             listBankCustomers.insert(listCounter, bankCustomer.printToGuiComponents())
+
+    if (BankClass_ENUM.ARBEJDERNES_LANDSBANK.value == global_Bank_Choosen.get()):
+        for bankCustomer in bankCustomerList:
+            className = bankCustomer.__class__.__name__
+            if ("arbejdernesLandsbank_Class" == className):
+                listBankCustomers.insert(listCounter, bankCustomer.printToGuiComponents())
+
+    if (BankClass_ENUM.SPARNORD_BANK.value == global_Bank_Choosen.get()):
+        for bankCustomer in bankCustomerList:
+            className = bankCustomer.__class__.__name__
+            if ("sparNordBank_Class" == className):
+                listBankCustomers.insert(listCounter, bankCustomer.printToGuiComponents())
+
+    if (BankClass_ENUM.SPARNORD_BANK_FORDELSKUNDE.value == global_Bank_Choosen.get()):
+        for bankCustomer in bankCustomerList:
+            className = bankCustomer.__class__.__name__
+            if ("sparNordBankFordelKunde_Class" == className):
+                listBankCustomers.insert(listCounter, bankCustomer.printToGuiComponents())
 
 if __name__ == '__main__':
     bankCustomerList = []
 
     root = tk.Tk()
 
-    global_Bank_Choosen = 0
-    global_New_Bank_Customer_Choosen = 1
+    global_Bank_Choosen = IntVar()
+    global_New_Bank_Customer_Choosen = IntVar()
+
+    global_Bank_Choosen.set(BankClass_ENUM.ALLE_BANKER.value)
+    global_New_Bank_Customer_Choosen.set(BankClass_ENUM.ARBEJDERNES_LANDSBANK.value)
 
     root.title("Bank System")
     root.geometry("1024x768")
@@ -42,14 +70,6 @@ if __name__ == '__main__':
     tabControl.pack(expand=1, fill="both")
 
     # Nu opretter vi kontroller til vores Tab : tabBankOverview
-    """
-    labelFrame = ttk.LabelFrame(tabBankOverview, text="First Tab Widgets")
-    labelFrame.grid(column = 0, row = 0, padx = 8, pady = 10)
-
-    label = ttk.Label(labelFrame, text="Enter your Nanme : ")
-    label.grid(column = 0, row = 0, sticky="W")
-    """
-
     labelBankOverview = ttk.Label(tabBankOverview, text="Se Bank : ")
     labelBankOverview.grid(column=0, row=0, padx = 8, pady = 10, sticky="W")
 
@@ -61,19 +81,25 @@ if __name__ == '__main__':
     tkVar.set("Alle Banker") # Sæt default option
 
     def change_banks_dropdown(*args):
+        global global_Bank_Choosen
         print(tkVar.get())
         if ("Alle Banker" == tkVar.get()):
-            global_Bank_Choosen = 0
+            global_Bank_Choosen.set(BankClass_ENUM.ALLE_BANKER.value)
             labelBankCustomerText.set("Oversigt over Bank Kunder i Alle Banker")
+
         if ("Arbejdernes Landsbank" == tkVar.get()):
-            global_Bank_Choosen = 1
+            global_Bank_Choosen.set(BankClass_ENUM.ARBEJDERNES_LANDSBANK.value)
             labelBankCustomerText.set("Oversigt over Bank Kunder i Arbejdernes Landsbank")
+
         if ("SparNord Bank" == tkVar.get()):
-            global_Bank_Choosen = 2
+            global_Bank_Choosen.set(BankClass_ENUM.SPARNORD_BANK.value)
             labelBankCustomerText.set("Oversigt over Bank Kunder i SparNord Bank")
+
         if ("SparNord Bank Fordelskunde" == tkVar.get()):
-            global_Bank_Choosen = 3
+            global_Bank_Choosen.set(BankClass_ENUM.SPARNORD_BANK_FORDELSKUNDE.value)
             labelBankCustomerText.set("Oversigt over Bank Kunder i SparNord Bank Fordelskunde")
+
+        updateBankCustomersList(listBankCustomers, bankCustomerList, global_Bank_Choosen)
 
     tkVar.trace('w', change_banks_dropdown)
 
@@ -86,14 +112,20 @@ if __name__ == '__main__':
                 "SparNord Bank Fordelskunde"}
     tkVarNew.set("Arbejdernes Landsbank")  # Sæt default option
 
+    global_New_Bank_Customer_Choosen.set(1)
     def change_newBankCustomer_dropdown(*args):
+        global global_New_Bank_Customer_Choosen
         print(tkVar.get())
         if ("Arbejdernes Landsbank" == tkVarNew.get()):
-            global_New_Bank_Customer_Choosen = 1
+            global_New_Bank_Customer_Choosen.set(BankClass_ENUM.ARBEJDERNES_LANDSBANK.value)
+
         if ("SparNord Bank" == tkVarNew.get()):
-            global_New_Bank_Customer_Choosen = 2
+            global_New_Bank_Customer_Choosen.set(BankClass_ENUM.SPARNORD_BANK.value)
+
         if ("SparNord Bank Fordelskunde" == tkVarNew.get()):
-            global_New_Bank_Customer_Choosen = 3
+            global_New_Bank_Customer_Choosen.set(BankClass_ENUM.SPARNORD_BANK_FORDELSKUNDE.value)
+
+        updateBankCustomersList(listBankCustomers, bankCustomerList, global_Bank_Choosen)
 
     tkVarNew.trace('w', change_newBankCustomer_dropdown)
 
@@ -107,13 +139,17 @@ if __name__ == '__main__':
     txtboxNewBankCustomer.grid(column = 1, row = 1)
 
     def saveNewBankCustomer():
+        global global_New_Bank_Customer_Choosen
         bankAccountCustomerName =  txtboxNewBankCustomer.get()
-        if (1 == global_New_Bank_Customer_Choosen):
+        if (BankClass_ENUM.ARBEJDERNES_LANDSBANK == BankClass_ENUM(global_New_Bank_Customer_Choosen.get())):
             bankCustomerList.append(arbejdernesLandsbank_Class(name=bankAccountCustomerName))
-        if (2 == global_New_Bank_Customer_Choosen):
+
+        if (BankClass_ENUM.SPARNORD_BANK == BankClass_ENUM(global_New_Bank_Customer_Choosen.get())):
             bankCustomerList.append(sparNordBank_Class(name="Test"))
-        if (3 == global_New_Bank_Customer_Choosen):
+
+        if (BankClass_ENUM.SPARNORD_BANK_FORDELSKUNDE == BankClass_ENUM(global_New_Bank_Customer_Choosen.get())):
             bankCustomerList.append(sparNordBankFordelKunde_Class(name="Test"))
+
         updateBankCustomersList(listBankCustomers, bankCustomerList, global_Bank_Choosen)
         txtboxNewBankCustomer.delete(0, END)
 
