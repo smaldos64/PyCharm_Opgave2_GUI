@@ -67,7 +67,7 @@ if __name__ == '__main__':
             labelBankCustomerText.set("Oversigt over Bank Kunder i Alle Banker")
         if ("Arbejdernes Landsbank" == tkVar.get()):
             global_Bank_Choosen = 1
-            labelBankCustomerText.set("Oversigt over Bank Kunder i Aejdernes Landsbank")
+            labelBankCustomerText.set("Oversigt over Bank Kunder i Arbejdernes Landsbank")
         if ("SparNord Bank" == tkVar.get()):
             global_Bank_Choosen = 2
             labelBankCustomerText.set("Oversigt over Bank Kunder i SparNord Bank")
@@ -100,7 +100,7 @@ if __name__ == '__main__':
     popupMenuNewBankCustomers = OptionMenu(tabBankOverview, tkVarNew, *banksNew)
     popupMenuNewBankCustomers.grid(row = 0, column = 2)
 
-    labelNewBankCustomer = ttk.Label(tabBankOverview, text="Navn på nu Bank Kunde : ")
+    labelNewBankCustomer = ttk.Label(tabBankOverview, text="Navn på ny Bank Kunde : ")
     labelNewBankCustomer.grid(column=0, row=1, padx=8, pady=10, sticky="W")
 
     txtboxNewBankCustomer = Entry(tabBankOverview, width=50)
@@ -127,7 +127,7 @@ if __name__ == '__main__':
     labelBankCustomer = ttk.Label(tabBankOverview, textvariable=labelBankCustomerText)
     labelBankCustomer.grid(column=0, row=3, padx=8, pady=10, sticky="W")
 
-    listBankCustomers = Listbox(tabBankOverview, width=50)
+    listBankCustomers = Listbox(tabBankOverview, width=80)
     listBankCustomers.grid(row=4, column=0, padx=8, pady=10)
     #listBankCustomers.pack();
 
