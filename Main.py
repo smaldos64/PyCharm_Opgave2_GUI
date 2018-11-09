@@ -22,24 +22,28 @@ def updateBankCustomersList(listBankCustomers, bankCustomerList, global_Bank_Cho
     if (BankClass_ENUM.ALLE_BANKER.value == global_Bank_Choosen.get()):
         for bankCustomer in bankCustomerList:
             listBankCustomers.insert(listCounter, bankCustomer.printToGuiComponents())
+            listCounter += 1
 
     if (BankClass_ENUM.ARBEJDERNES_LANDSBANK.value == global_Bank_Choosen.get()):
         for bankCustomer in bankCustomerList:
             className = bankCustomer.__class__.__name__
             if ("arbejdernesLandsbank_Class" == className):
                 listBankCustomers.insert(listCounter, bankCustomer.printToGuiComponents())
+                listCounter += 1
 
     if (BankClass_ENUM.SPARNORD_BANK.value == global_Bank_Choosen.get()):
         for bankCustomer in bankCustomerList:
             className = bankCustomer.__class__.__name__
             if ("sparNordBank_Class" == className):
                 listBankCustomers.insert(listCounter, bankCustomer.printToGuiComponents())
+                listCounter += 1
 
     if (BankClass_ENUM.SPARNORD_BANK_FORDELSKUNDE.value == global_Bank_Choosen.get()):
         for bankCustomer in bankCustomerList:
             className = bankCustomer.__class__.__name__
             if ("sparNordBankFordelKunde_Class" == className):
                 listBankCustomers.insert(listCounter, bankCustomer.printToGuiComponents())
+                listCounter += 1
 
 if __name__ == '__main__':
     bankCustomerList = []
