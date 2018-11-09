@@ -18,32 +18,32 @@ class BankClass_ENUM(Enum):
 
 def updateBankCustomersList(listBankCustomers, bankCustomerList, global_Bank_Choosen):
     listBankCustomers.delete(0, END)
-    listCounter = 1
+    listCounter = 0
     if (BankClass_ENUM.ALLE_BANKER.value == global_Bank_Choosen.get()):
         for bankCustomer in bankCustomerList:
-            listBankCustomers.insert(listCounter, bankCustomer.printToGuiComponents())
+            listBankCustomers.insert(END, str(listCounter) + " : " + bankCustomer.printToGuiComponents())
             listCounter += 1
 
     if (BankClass_ENUM.ARBEJDERNES_LANDSBANK.value == global_Bank_Choosen.get()):
         for bankCustomer in bankCustomerList:
             className = bankCustomer.__class__.__name__
             if ("arbejdernesLandsbank_Class" == className):
-                listBankCustomers.insert(listCounter, bankCustomer.printToGuiComponents())
+                listBankCustomers.insert(END, str(listCounter) + " : " + bankCustomer.printToGuiComponents())
                 listCounter += 1
 
     if (BankClass_ENUM.SPARNORD_BANK.value == global_Bank_Choosen.get()):
         for bankCustomer in bankCustomerList:
             className = bankCustomer.__class__.__name__
             if ("sparNordBank_Class" == className):
-                listBankCustomers.insert(listCounter, bankCustomer.printToGuiComponents())
-                listCounter += 1
+                listBankCustomers.insert(END, str(listCounter) + " : " + bankCustomer.printToGuiComponents())
+            listCounter += 1
 
     if (BankClass_ENUM.SPARNORD_BANK_FORDELSKUNDE.value == global_Bank_Choosen.get()):
         for bankCustomer in bankCustomerList:
             className = bankCustomer.__class__.__name__
             if ("sparNordBankFordelKunde_Class" == className):
-                listBankCustomers.insert(listCounter, bankCustomer.printToGuiComponents())
-                listCounter += 1
+                listBankCustomers.insert(END, str(listCounter) + " : " + bankCustomer.printToGuiComponents())
+            listCounter += 1
 
 if __name__ == '__main__':
     bankCustomerList = []
@@ -167,8 +167,18 @@ if __name__ == '__main__':
     labelBankCustomer = ttk.Label(tabBankOverview, textvariable=labelBankCustomerText)
     labelBankCustomer.grid(column=0, row=3, padx=8, pady=10, sticky="W")
 
-    listBankCustomers = Listbox(tabBankOverview, width=80)
+    def ListBankCustomersSelect(evt):
+        #w = evt.widget
+        index = listBankCustomers.curselection()[0]
+        #index = int(w.curseselection()[0])
+        #value = w.get(index)
+        value = listBankCustomers.get(index)
+        print('Du valgte item %d : "%s"' % (index, value))
+
+    listBankCustomers = Listbox(tabBankOverview, width=80, selectmode="SINGLE",
+                                name="listBankCustomers")
     listBankCustomers.grid(row=4, column=0, padx=8, pady=10)
+    listBankCustomers.bind('<<ListboxSelect>>', ListBankCustomersSelect)
     #listBankCustomers.pack();
 
     # Nu opretter vi kontroller til vores Tab : tabCustomerOverview
