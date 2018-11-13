@@ -46,15 +46,20 @@ def updateBankCustomersList(listBankCustomers, bankCustomerList, global_Bank_Cho
             listCounter += 1
 
 if __name__ == '__main__':
-    bankCustomerList = []
+    def closeWindow():
+        root.destroy()
 
+    bankCustomerList = []
+    bankCustomerTransactionsList = []
     root = tk.Tk()
 
     global_Bank_Choosen = IntVar()
     global_New_Bank_Customer_Choosen = IntVar()
+    global_Customer_Choosen_Index = IntVar()
 
     global_Bank_Choosen.set(BankClass_ENUM.ALLE_BANKER.value)
     global_New_Bank_Customer_Choosen.set(BankClass_ENUM.ARBEJDERNES_LANDSBANK.value)
+    global_Customer_Choosen_Index.set(-1)
 
     root.title("Bank System")
     root.geometry("1024x768")
@@ -139,6 +144,7 @@ if __name__ == '__main__':
     labelNewBankCustomer = ttk.Label(tabBankOverview, text="Navn på ny Bank Kunde : ")
     labelNewBankCustomer.grid(column=0, row=1, padx=8, pady=10, sticky="W")
 
+    # Her defineres en tekstboks, som vi kan skrive tekst ind i.
     txtboxNewBankCustomer = Entry(tabBankOverview, width=50)
     txtboxNewBankCustomer.grid(column = 1, row = 1)
 
@@ -149,17 +155,29 @@ if __name__ == '__main__':
             bankCustomerList.append(arbejdernesLandsbank_Class(name=bankAccountCustomerName))
 
         if (BankClass_ENUM.SPARNORD_BANK == BankClass_ENUM(global_New_Bank_Customer_Choosen.get())):
-            bankCustomerList.append(sparNordBank_Class(name="Test"))
+            bankCustomerList.append(sparNordBank_Class(name=bankAccountCustomerName))
 
         if (BankClass_ENUM.SPARNORD_BANK_FORDELSKUNDE == BankClass_ENUM(global_New_Bank_Customer_Choosen.get())):
-            bankCustomerList.append(sparNordBankFordelKunde_Class(name="Test"))
+            bankCustomerList.append(sparNordBankFordelKunde_Class(name=bankAccountCustomerName))
 
         updateBankCustomersList(listBankCustomers, bankCustomerList, global_Bank_Choosen)
         txtboxNewBankCustomer.delete(0, END)
 
+
+    def deleteBankCustomer():
+        del bankCustomerList[global_Customer_Choosen_Index.get()]
+        listCurrentBankCustomerTransactions.delete(0, END)
+        updateBankCustomersList(listBankCustomers, bankCustomerList, global_Bank_Choosen)
+        global_Customer_Choosen_Index.set(-1)
+        labelCurrentBankCustomerText.set("Ingen kunde valgt !!!")
+
     newBankCustomerButton = ttk.Button(tabBankOverview, text="Gem ny Bank Kunde",
                                        command = saveNewBankCustomer)
     newBankCustomerButton.grid(row = 2, column = 0, padx=8, pady=10)
+
+    deleteCustomerButton = ttk.Button(tabBankOverview, text="Slet Bank Kunde",
+                                       command = deleteBankCustomer)
+    deleteCustomerButton.grid(row = 2, column = 1, padx=8, pady=10)
 
     labelBankCustomerText = StringVar()
     labelBankCustomerText.set("Oversigt over Bank Kunder i Alle Banker")
@@ -168,25 +186,73 @@ if __name__ == '__main__':
     labelBankCustomer.grid(column=0, row=3, padx=8, pady=10, sticky="W")
 
     def ListBankCustomersSelect(evt):
-        #w = evt.widget
         index = listBankCustomers.curselection()[0]
-        #index = int(w.curseselection()[0])
-        #value = w.get(index)
         value = listBankCustomers.get(index)
+        global_Customer_Choosen_Index.set(index)
+        labelCurrentBankCustomerText.set("Kunde med index %d er valgt" % (index))
+        listCurrentBankCustomerTransactions.delete(0, END)
+        bankCustomerTransactionsList = bankCustomerList[index].printBankAccountTransactionsGUI()
+        for bankCustomerTransaction in bankCustomerTransactionsList:
+            listCurrentBankCustomerTransactions.insert(END, bankCustomerTransaction)
+
         print('Du valgte item %d : "%s"' % (index, value))
 
     listBankCustomers = Listbox(tabBankOverview, width=80, selectmode="SINGLE",
                                 name="listBankCustomers")
     listBankCustomers.grid(row=4, column=0, padx=8, pady=10)
     listBankCustomers.bind('<<ListboxSelect>>', ListBankCustomersSelect)
-    #listBankCustomers.pack();
+
+    closeButton1 = ttk.Button(tabBankOverview, text="Quit", command=closeWindow)
+    closeButton1.grid(column=0, row=6, padx=8, pady=10, sticky="W")
 
     # Nu opretter vi kontroller til vores Tab : tabCustomerOverview
 
-    label2 = ttk.Label(tabCustomerOverview, text="Label på Tab 2 !!!")
-    label2.grid(column=0, row=0, padx=8, pady=10, sticky="W")
+    labelCurrentBankCustomerText = StringVar()
+    labelCurrentBankCustomerText.set("Ingen kunde valgt !!!")
 
-    label2_2 = ttk.Label(tabCustomerOverview, text="Label 2 på Tab 2 !!!")
-    label2_2.grid(column=0, row=1, padx=8, pady=10, sticky="W")
+    labelCurrentBankCustomer = ttk.Label(tabCustomerOverview, textvariable=labelCurrentBankCustomerText)
+    labelCurrentBankCustomer.grid(column=0, row=0, padx=8, pady=10, sticky="W")
+
+    listCurrentBankCustomerTransactions = Listbox(tabCustomerOverview, width=80, selectmode="SINGLE",
+                                name="listCurrentBankCustomerTransactions")
+    listCurrentBankCustomerTransactions.grid(row=1, column=0, padx=8, pady=10)
+
+    def depositAmount():
+        amount = float(txtboxBankCustomerTransactions.get())
+        txtboxBankCustomerTransactions.delete(0, END)
+        bankCustomerList[global_Customer_Choosen_Index.get()].deposit(amount)
+        listCurrentBankCustomerTransactions.delete(0, END)
+        bankCustomerTransactionsList = bankCustomerList[global_Customer_Choosen_Index.get()].printBankAccountTransactionsGUI()
+        for bankCustomerTransaction in bankCustomerTransactionsList:
+            listCurrentBankCustomerTransactions.insert(END, bankCustomerTransaction)
+        updateBankCustomersList(listBankCustomers, bankCustomerList, global_Bank_Choosen)
+
+    def withdrawAmount():
+        amount = float(txtboxBankCustomerTransactions.get())
+        txtboxBankCustomerTransactions.delete(0, END)
+        bankCustomerList[global_Customer_Choosen_Index.get()].withdraw(amount)
+        listCurrentBankCustomerTransactions.delete(0, END)
+        bankCustomerTransactionsList = bankCustomerList[global_Customer_Choosen_Index.get()].printBankAccountTransactionsGUI()
+        for bankCustomerTransaction in bankCustomerTransactionsList:
+            listCurrentBankCustomerTransactions.insert(END, bankCustomerTransaction)
+        updateBankCustomersList(listBankCustomers, bankCustomerList, global_Bank_Choosen)
+
+    bankCustomerDepositButton = ttk.Button(tabCustomerOverview, text="Indsæt beløb på konto",
+                                       command=depositAmount)
+    bankCustomerDepositButton.grid(row=2, column=0, padx=8, pady=10)
+
+    bankCustomerWithdrawButton = ttk.Button(tabCustomerOverview, text="Hæv beløb på konto",
+                                           command=withdrawAmount)
+    bankCustomerWithdrawButton.grid(row=2, column=1, padx=8, pady=10)
+
+    labelBankCustomerTransactions = ttk.Label(tabCustomerOverview, text="Indtast ønsket beløb : ")
+    labelBankCustomerTransactions.grid(column=0, row=3, padx=8, pady=10, sticky="W")
+
+    # Her defineres en tekstboks, som vi kan skrive tekst ind i.
+    txtboxBankCustomerTransactions = Entry(tabCustomerOverview, width=50)
+    txtboxBankCustomerTransactions.grid(column=1, row=3)
+
+    closeButton2 = ttk.Button(tabCustomerOverview, text="Quit", command=closeWindow)
+    closeButton2.grid(column=0, row=5, padx=8, pady=10, sticky="W")
 
     root.mainloop()

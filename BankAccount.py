@@ -80,11 +80,27 @@ class bankAccount_Class(object):
 
         return (returnString)
 
+    def printBankAccountTransactionsGUI(self):
+        returnStringList = []
+
+        returnStringList.append("Transaktioner for %s, der er kunde i %s" % (self._name, self._bankName))
+        returnStringList.append("Kontobevægelse Saldo")
+        returnStringList.append("--------------------")
+
+        for bankTransAction in self._transactionList:
+            returnStringList.append(str("%.2fkr" % bankTransAction._transactionAmount) + " " + str("%.2fkr" % bankTransAction._balance))
+
+        # Modsat i f.eks. C# kan man få fat i en statisk variabel her _bankName, der
+        # er defineret på en klasse ved brug af et objekt på klassen !!!
+        print(" ")
+
+        return (returnStringList)
+
     def setPrintTransactions(self, printTransactions):
         self._printTransactions = printTransactions
 
     def printToGuiComponents(self):
-        returnString = self._name + " med kontobeløb " + str("%.2f" % self._balance) + " er kunde i " + self.__class__.__name__
+        returnString = self._name + " med kontobeløb " + str("%.2f" % self._balance) + "kr er kunde i " + self.__class__.__name__
         return (returnString)
 
 class arbejdernesLandsbank_Class(bankAccount_Class):
